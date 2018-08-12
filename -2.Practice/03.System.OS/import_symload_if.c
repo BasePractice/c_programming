@@ -7,6 +7,7 @@
 #define dlopen LoadLibrary
 #define dlsym  GetProcAddress
 #else
+#include <dlfcn.h>
 #endif
 
 #define DLL_LIBRARY_NAME "lib03.System.OS_export_if.dll"
