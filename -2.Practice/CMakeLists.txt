@@ -29,4 +29,6 @@ else ()
     set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fPIC ")
 endif ()
 
+include_directories(00.Base)
+
 add_subdirectory(03.System.OS)

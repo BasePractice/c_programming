@@ -26,7 +26,13 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Library: %s not found\n", DLL_LIBRARY_NAME);
         return -1;
     }
-    pfn_export_if = (Pfn_ExportIf_Function)dlsym(h, DLL_IMPORT_NAME);
+
+    if (argc > 1) {
+        pfn_export_if = (void *)strtoul(argv[1], 0, 16);
+    } else {
+        pfn_export_if = (Pfn_ExportIf_Function) dlsym(h, DLL_IMPORT_NAME);
+    }
+    fprintf(stdout, "Symbol: 0x%p\n", pfn_export_if);
     if (pfn_export_if == 0) {
         if (pfn_export_if == 0) {
             fprintf(stderr, "Symbol: %s not found\n", DLL_IMPORT_NAME);

@@ -1,6 +1,8 @@
 ﻿#ifndef IF_H
 #define IF_H
 
+#include <base_macro.h>
+
 #if defined(_MSC_VER)
 #if defined(DLL_EXPORT)
 #define DLL_EXPORT_API _declspec(dllexport)
@@ -10,11 +12,11 @@
 #else
 #endif
 #if defined(DLL_EXPORT)
-#define DLL_EXPORT_API __attribute__ ((visibility ("hidden")))
+#define DLL_EXPORT_API __attribute__ ((visibility ("default")))
 #else
 #define DLL_EXPORT_API
 #endif
 
-DLL_EXPORT_API char * hello_text(void);
+EXTERN_C DLL_EXPORT_API char * hello_text(void);
 
 #endif
