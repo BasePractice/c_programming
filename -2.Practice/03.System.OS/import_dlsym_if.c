@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     }
 
     if (argc > 1) {
-        pfn_export_if = (void *)strtoul(argv[1], 0, 16);
+        pfn_export_if = (void *)strtoll(argv[1], 0, 16);
     } else {
         pfn_export_if = (Pfn_ExportIf_Function) dlsym(h, DLL_IMPORT_NAME);
     }

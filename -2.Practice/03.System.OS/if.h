@@ -1,5 +1,5 @@
-﻿#ifndef IF_H
-#define IF_H
+﻿#ifndef C_PROGRAMMING_PRACTICE_IF_H
+#define C_PROGRAMMING_PRACTICE_IF_H
 
 #include <base_macro.h>
 
