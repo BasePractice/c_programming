@@ -4,13 +4,16 @@
 #if defined(WIN32)
 #include <Windows.h>
 
-#define dlopen LoadLibrary
-#define dlsym  GetProcAddress
+#define dlopen(n, m) LoadLibrary(n)
+#define dlsym(h, s)  GetProcAddress(h, s)
+#define dlerror()    "unknown"
+#define DLL_LIBRARY_NAME "lib03.System.OS_export_if.dll"
 #else
 #include <dlfcn.h>
+#define DLL_LIBRARY_NAME "lib03.System.OS_export_if.so"
 #endif
 
-#define DLL_LIBRARY_NAME "lib03.System.OS_export_if.dll"
+
 #define DLL_IMPORT_NAME "hello_text"
 
 typedef char * (*Pfn_ExportIf_Function)(void);
@@ -21,9 +24,9 @@ int main(int argc, char **argv) {
     char *hello = 0;
     void *h;
 
-    h = dlopen(DLL_LIBRARY_NAME);
+    h = dlopen(DLL_LIBRARY_NAME, RTLD_NOW);
     if (h == 0) {
-        fprintf(stderr, "Library: %s not found\n", DLL_LIBRARY_NAME);
+        fprintf(stderr, "Library: %s not found. Error: %s\n", DLL_LIBRARY_NAME, dlerror());
         return -1;
     }
 
