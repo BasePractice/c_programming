@@ -10,7 +10,11 @@
 #define DLL_LIBRARY_NAME "lib03.System.OS_export_if.dll"
 #else
 #include <dlfcn.h>
+#if defined(__APPLE__)
+#define DLL_LIBRARY_NAME "lib03.System.OS_export_if.dylib"
+#else
 #define DLL_LIBRARY_NAME "lib03.System.OS_export_if.so"
+#endif
 #endif
 
 

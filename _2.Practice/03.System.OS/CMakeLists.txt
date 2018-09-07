@@ -9,7 +9,7 @@ set(HEADER_FILES if.h)
 set(EXE_SOURCE_FILES import_if.c)
 set(DLL_SOURCE_FILES export_if.c ../00.Base/base_macro.h)
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
     set(OS_LIBRARIES dl)
 endif ()
 
