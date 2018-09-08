@@ -1,5 +1,4 @@
-﻿#define DLL_EXPORT
-#include "if.h"
+﻿#include "if.h"
 
 char *
 hello_text(void) {

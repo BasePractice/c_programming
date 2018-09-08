@@ -8,6 +8,7 @@ include_directories(.)
 set(HEADER_FILES if.h)
 set(EXE_SOURCE_FILES import_if.c)
 set(DLL_SOURCE_FILES export_if.c ../00.Base/base_macro.h)
+add_definitions(-DDLL_EXPORT)
 
 if (UNIX AND NOT APPLE)
     set(OS_LIBRARIES dl)
