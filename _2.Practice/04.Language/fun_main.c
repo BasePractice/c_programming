@@ -2,19 +2,19 @@
 #include <stdlib.h>
 
 #if defined(_MSC_VER)
-#define stdcall __declspec(stdcall)
-#define cdecl   __declspec(cdecl)
+#define stdcall __stdcall
+#define cdecl   __cdecl
 #else
 #define stdcall __attribute__((stdcall))
 #define cdecl   __attribute__((cdecl))
 #endif
 
-stdcall void fun_stdcall() {
+void stdcall fun_stdcall() {
     fprintf(stdout, "fun_stdcall\n");
     fflush(stdout);
 }
 
-cdecl void fun_cdecl() {
+void cdecl fun_cdecl() {
     fprintf(stdout, "fun_cdecl\n");
     fflush(stdout);
 }

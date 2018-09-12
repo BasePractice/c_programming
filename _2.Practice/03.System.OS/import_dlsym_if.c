@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#if defined(WIN32)
+#if defined(WIN32) || defined(_MSC_VER)
 #include <Windows.h>
 
 #define dlopen(n, m) LoadLibrary(n)
