@@ -15,8 +15,11 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 add_library(${PROJECT_NAME}_export_if SHARED ${DLL_SOURCE_FILES} ${HEADER_FILES})
+add_library(${PROJECT_NAME}_static_if STATIC ${DLL_SOURCE_FILES} ${HEADER_FILES})
 add_executable(${PROJECT_NAME}_import_if ${EXE_SOURCE_FILES} ${HEADER_FILES})
+add_executable(${PROJECT_NAME}_stlink_if ${EXE_SOURCE_FILES} ${HEADER_FILES})
 add_executable(${PROJECT_NAME}_import_dlsym_if import_dlsym_if.c ${HEADER_FILES})
 
 target_link_libraries(${PROJECT_NAME}_import_if ${PROJECT_NAME}_export_if)
+target_link_libraries(${PROJECT_NAME}_stlink_if ${PROJECT_NAME}_static_if)
 target_link_libraries(${PROJECT_NAME}_import_dlsym_if ${OS_LIBRARIES})
