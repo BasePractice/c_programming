@@ -7,8 +7,13 @@ include_directories(.)
 
 set(SIMPLE_MAIN simple_main.c)
 
-add_executable(${PROJECT_NAME}_simple_main ${SIMPLE_MAIN})
-if (UNIX)
+
+if( (UNIX AND NOT APPLE) OR WIN32)
+    add_executable(${PROJECT_NAME}_simple_main ${SIMPLE_MAIN})
+    set_target_properties(${PROJECT_NAME}_simple_main PROPERTIES COMPILE_OPTIONS -Wattributes)
+endif ()
+
+if(UNIX AND NOT APPLE)
     set_target_properties(${PROJECT_NAME}_simple_main PROPERTIES COMPILE_OPTIONS -Wattributes)
 endif ()
 
