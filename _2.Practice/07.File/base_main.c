@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <property.h>
 
 #if defined(WIN32)
 #include <direct.h>
@@ -13,10 +14,14 @@
 
 #endif
 
+typedef bool (*READ_LINE_CALLBACK)(char *line, void *user_data);
+
 char *get_absolute_filename(const char *filename);
 bool is_file_exists(char *filename);
 bool is_executable(char *filename);
-void print_lines(char *filename);
+void read_lines(char *filename, READ_LINE_CALLBACK callback, void *user_data);
+bool property_dynamic_free(char *key, char *value, void *user_data);
+bool parse_line(char *line, void *user_data);
 
 int main(int argc, char **argv) {
     char *absolute_filename;
@@ -29,12 +34,18 @@ int main(int argc, char **argv) {
     for (i = 1; i < argc; ++i) {
         absolute_filename = get_absolute_filename(argv[i]);
         bool exists = is_file_exists(absolute_filename);
+        if (!exists) {
+            absolute_filename = strdup(argv[i]);
+            exists = is_file_exists(absolute_filename);
+        }
         bool executable = is_executable(absolute_filename);
         fprintf(stdout, "%s: %s, %s\n", absolute_filename,
                 exists ? "exists" : "not found",
                 executable ? "executable" : "not executable");
         if (!executable) {
-            print_lines(absolute_filename);
+            struct Property *root = property_new("root", "root");
+            read_lines(absolute_filename, parse_line, root);
+            property_destroy(root, property_dynamic_free, 0);
         }
         free(absolute_filename);
     }
@@ -69,9 +80,10 @@ bool is_executable(char *filename) {
 
 #define LINE_READ_BUFFER_SIZE 10
 
-void print_lines(char *filename) {
+void read_lines(char *filename, READ_LINE_CALLBACK callback, void *user_data) {
     FILE *fd = fopen(filename, "r");
     if (fd != 0) {
+        bool next = true;
         int ch;
         char *line;
         size_t line_allocated_size = 0;
@@ -80,14 +92,14 @@ void print_lines(char *filename) {
         line_allocated_size = LINE_READ_BUFFER_SIZE;
         line = calloc(LINE_READ_BUFFER_SIZE, 1);
 
-        while ((ch = fgetc(fd)) != EOF) {
+        while (next && (ch = fgetc(fd)) != EOF) {
             if (line_it > line_allocated_size) {
                 line_allocated_size += LINE_READ_BUFFER_SIZE;
                 line = realloc(line, line_allocated_size);
             }
             if (ch == '\n') {
                 line[line_it] = 0;
-                fprintf(stdout, "%s\n", line);
+                next = (*callback)(line, user_data);
                 line_it = 0;
                 continue;
             } else {
@@ -95,6 +107,7 @@ void print_lines(char *filename) {
             }
             ++line_it;
         }
+        free(line);
         fclose(fd);
     }
 }
@@ -119,4 +132,20 @@ char *get_absolute_filename(const char *filename) {
     strcat(absolute_filename, "/");
     strcat(absolute_filename, filename);
     return absolute_filename;
+}
+
+bool parse_line(char *line, void *user_data) {
+    struct Property *root = user_data;
+    if (line[0] == '#')
+        return true;
+    char *key = strtok(line, "=");
+    char *value = line + strlen(key) + 1;
+    property_add(root, strdup(key), strdup(value));
+    return true;
+}
+
+bool property_dynamic_free(char *key, char *value, void *user_data) {
+    free(key);
+    free(value);
+    return true;
 }
