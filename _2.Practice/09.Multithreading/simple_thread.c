@@ -10,14 +10,15 @@
 
 static volatile int thread_id = 0;
 
-void *simple_thread_procedure(void *parameter) {
+void *
+simple_thread_procedure(void *parameter) {
     int tid = thread_id;
     unsigned int timeout;
 
     ++thread_id;
     fprintf(stdout,
             "[%03d]Thread %lu started\n", tid, pthread_self());
-    timeout = (unsigned int)rand() % 10 + 1;
+    timeout = (unsigned int) rand() % 10 + 1;
     usleep(timeout * 1000 * 1000);
     fprintf(stdout,
             "[%03d]Thread %lu complete %d seconds\n", tid, pthread_self(), timeout);
@@ -55,7 +56,7 @@ destroy_thread_count(pthread_t *threads, size_t count) {
 int main(int argc, char **argv) {
     pthread_t *threads;
 
-    srand((unsigned int)time(0));
+    srand((unsigned int) time(0));
     threads = create_thread_count(
             MAX_THREADS, simple_thread_procedure, (void *) 10);
     destroy_thread_count(threads, MAX_THREADS);
