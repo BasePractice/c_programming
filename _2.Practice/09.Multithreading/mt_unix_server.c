@@ -4,6 +4,17 @@
 #include <memory.h>
 #include <stdbool.h>
 #include <errno.h>
+
+#if defined(_WIN32)
+#  ifndef WIN32_LEAN_AND_MEAN
+#  define WIN32_LEAN_AND_MEAN
+#  endif
+
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+
 #include <unistd.h>
 #include <time.h>
 #include <pthread.h>
@@ -11,7 +22,9 @@
 #include <fcntl.h>
 #include <sys/time.h>
 
-//https://pastebin.com/WgH1Nb5h
+#define closesocket(s)  close((s))
+
+#endif
 
 void *read_request(void *parameter) {
     uint8_t buf[1024];
@@ -31,9 +44,12 @@ void *read_request(void *parameter) {
         buf[++it] = 0;
     }
     send(sock, buf, (size_t) it, 0);
+    buf[it] = 0;
     fprintf(stdout, "%s\n", buf);
-    close(sock);
+    closesocket(sock);
+#ifndef _WIN32
     pthread_exit(0);
+#endif
 }
 
 int
@@ -42,6 +58,17 @@ socket_listen_server(const char *port) {
     int ret;
     int option = 1;
     int listen_socket;
+
+#if defined(_WIN32)
+    WSADATA wsa_data;
+    int ret;
+
+    ret = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+    if (ret != 0) {
+        fprintf(stderr, "WSAStartup failed: %d\n", ret);
+        return -1;
+    }
+#endif
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -70,12 +97,12 @@ socket_listen_server(const char *port) {
     if (ret == -1) {
         fprintf(stderr, "[server] bind failed with error: %d\n", errno);
         freeaddrinfo(result);
-        close(listen_socket);
+        closesocket(listen_socket);
         return -1;
     }
     if (listen(listen_socket, SOMAXCONN) == -1) {
         fprintf(stderr, "[server] listen failed with error: %i\n", errno);
-        close(listen_socket);
+        closesocket(listen_socket);
         return -1;
     }
     freeaddrinfo(result);
@@ -87,18 +114,31 @@ int main(int argc, char **argv) {
     struct sockaddr_in sock_addr_in;
     int sock_addr_len = sizeof(sock_addr_in);
     int listen_socket = socket_listen_server("7860");
-    bool running = true;
 
-    while (running) {
+    while (true) {
         pthread_t t;
         client_socket = accept(listen_socket,
                                (struct sockaddr *) &sock_addr_in,
                                (socklen_t *) &sock_addr_len);
-        running = client_socket != -1;
+        if (client_socket == -1)
+            break;
+#if defined(_WIN32)
+        DWORD thread_id = 0;
+        HANDLE h = CreateThread(NULL, 0, read_request, (void *) client_socket), 0, &thread_id);
+
+        if (h != INVALID_HANDLE_VALUE) {
+            CloseHandle(h);
+        }
+#else
         if (pthread_create(&t, 0, read_request, (void *) client_socket) == 0) {
             pthread_detach(t);
         }
+#endif
     }
+    closesocket(listen_socket);
+#if defined(_WIN32)
+    WSACleanup();
+#endif
     return EXIT_SUCCESS;
 }
 
