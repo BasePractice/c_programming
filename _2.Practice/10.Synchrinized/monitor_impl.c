@@ -35,6 +35,9 @@ void monitor_destroy(struct Monitor *monitor);
 
 void monitor_enter(struct Monitor *monitor, FUNCTION_MONITOR_ENTER cb);
 
+//EnterCriticalSection(&monitor->synchronize_object);
+//LeaveCriticalSection(&monitor->synchronize_object);
+
 
 int main(int argc, char **argv) {
     return EXIT_SUCCESS;
@@ -43,7 +46,7 @@ int main(int argc, char **argv) {
 void monitor_init(struct Monitor *monitor, Object object) {
     monitor->object = object;
 #if defined(_WIN32)
-#error "Not implement yet"
+    InitializeCriticalSectionAndSpinCount(&monitor->synchronize_object, 0x00000400);
 #else
     pthread_mutex_init(&monitor->synchronize_object, 0);
 #endif
@@ -51,7 +54,7 @@ void monitor_init(struct Monitor *monitor, Object object) {
 
 void monitor_destroy(struct Monitor *monitor) {
 #if defined(_WIN32)
-#error "Not implement yet"
+    DeleteCriticalSection(&monitor->synchronize_object);
 #else
     pthread_mutex_destroy(&monitor->synchronize_object);
 #endif
