@@ -32,6 +32,7 @@ else ()
 endif ()
 
 include_directories(00.Base)
+include_directories(00.Base/catch2/single_include)
 
 add_subdirectory(03.System.OS)
 add_subdirectory(04.Language)
@@ -40,5 +41,6 @@ add_subdirectory(07.File)
 add_subdirectory(08.Socket)
 add_subdirectory(09.Multithreading)
 add_subdirectory(10.Synchrinized)
+add_subdirectory(11.Testing)
 
 add_library(tests_main STATIC 00.Base/catch2/catch.hpp 00.Base/tests_main.cpp)

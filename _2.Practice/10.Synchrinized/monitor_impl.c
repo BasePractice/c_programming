@@ -24,6 +24,7 @@ monitor_destroy(struct Monitor *monitor) {
 #else
     pthread_mutex_destroy(&monitor->synchronize_object);
 #endif
+    monitor->object = 0;
 }
 
 void
