@@ -36,19 +36,32 @@ char *property_get(struct Property *root, const char *key) {
     return find.element != 0 ? find.element->value : 0;
 }
 
-static bool property_print(struct Property *element, void *user_data) {
+bool property_print(struct Property *element, void *user_data) {
+    if (strcmp(element->key, "root") == 0)
+        return true;
     fprintf(stdout, "%s = %s\n", element->key, element->value);
     return true;
 }
 
-void property_add(struct Property *list, char *key, char *value) {
-    struct Property *it = list;
+void property_delete(struct Property *root, const char *key) {
+    /*TODO: Реализовать самостоятельно */
+}
 
-    while (it != 0 && it->next != 0) {
-        it = it->next;
-    }
-    if (it != 0) {
-        it->next = property_new(key, value);
+void property_update(struct Property *list, char *key, char *value) {
+    struct Property *it = list;
+    struct PropertyFind find = {key, 0};
+    property_it(list, property_find, &find);
+    if (find.element != 0) {
+        free(find.element->value);
+        free(key);
+        find.element->value = value;
+    } else {
+        while (it != 0 && it->next != 0) {
+            it = it->next;
+        }
+        if (it != 0) {
+            it->next = property_new(key, value);
+        }
     }
 }
 
@@ -71,5 +84,57 @@ void property_destroy(struct Property *list, PAYLOAD_CALLBACK callback, void *us
 }
 
 bool payload_nothing_free(char *key, char *value, void *user_data) {
+    return true;
+}
+
+#define LINE_READ_BUFFER_SIZE 10
+
+void read_lines(char *filename, READ_LINE_CALLBACK callback, void *user_data) {
+    FILE *fd = fopen(filename, "r");
+    if (fd != 0) {
+        bool next = true;
+        int ch;
+        char *line;
+        size_t line_allocated_size = 0;
+        size_t line_it = 0;
+
+        line_allocated_size = LINE_READ_BUFFER_SIZE;
+        line = calloc(LINE_READ_BUFFER_SIZE, 1);
+
+        while (next && (ch = fgetc(fd)) != EOF) {
+            if (line_it > line_allocated_size) {
+                line_allocated_size += LINE_READ_BUFFER_SIZE;
+                line = realloc(line, line_allocated_size);
+            }
+            if (ch == '\n') {
+                line[line_it] = 0;
+                next = (*callback)(line, user_data);
+                line_it = 0;
+                continue;
+            } else {
+                line[line_it] = (char) ch;
+            }
+            ++line_it;
+        }
+        free(line);
+        fclose(fd);
+    }
+}
+
+bool parse_line(char *line, void *user_data) {
+    struct Property *root = user_data;
+    if (line[0] == '#')
+        return true;
+    char *key = strtok(line, "=");
+    char *value = line + strlen(key) + 1;
+    property_update(root, strdup(key), strdup(value));
+    return true;
+}
+
+bool property_dynamic_free(char *key, char *value, void *user_data) {
+    if (strcmp(key, "root") == 0)
+        return true;
+    free(key);
+    free(value);
     return true;
 }

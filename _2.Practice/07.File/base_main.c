@@ -19,9 +19,7 @@ typedef bool (*READ_LINE_CALLBACK)(char *line, void *user_data);
 char *get_absolute_filename(const char *filename);
 bool is_file_exists(char *filename);
 bool is_executable(char *filename);
-void read_lines(char *filename, READ_LINE_CALLBACK callback, void *user_data);
-bool property_dynamic_free(char *key, char *value, void *user_data);
-bool parse_line(char *line, void *user_data);
+
 
 int main(int argc, char **argv) {
     char *absolute_filename;
@@ -78,39 +76,7 @@ bool is_executable(char *filename) {
     return executable;
 }
 
-#define LINE_READ_BUFFER_SIZE 10
 
-void read_lines(char *filename, READ_LINE_CALLBACK callback, void *user_data) {
-    FILE *fd = fopen(filename, "r");
-    if (fd != 0) {
-        bool next = true;
-        int ch;
-        char *line;
-        size_t line_allocated_size = 0;
-        size_t line_it = 0;
-
-        line_allocated_size = LINE_READ_BUFFER_SIZE;
-        line = calloc(LINE_READ_BUFFER_SIZE, 1);
-
-        while (next && (ch = fgetc(fd)) != EOF) {
-            if (line_it > line_allocated_size) {
-                line_allocated_size += LINE_READ_BUFFER_SIZE;
-                line = realloc(line, line_allocated_size);
-            }
-            if (ch == '\n') {
-                line[line_it] = 0;
-                next = (*callback)(line, user_data);
-                line_it = 0;
-                continue;
-            } else {
-                line[line_it] = (char) ch;
-            }
-            ++line_it;
-        }
-        free(line);
-        fclose(fd);
-    }
-}
 
 bool is_file_exists(char *filename) {
     FILE *fd = fopen(filename, "r");
@@ -132,20 +98,4 @@ char *get_absolute_filename(const char *filename) {
     strcat(absolute_filename, "/");
     strcat(absolute_filename, filename);
     return absolute_filename;
-}
-
-bool parse_line(char *line, void *user_data) {
-    struct Property *root = user_data;
-    if (line[0] == '#')
-        return true;
-    char *key = strtok(line, "=");
-    char *value = line + strlen(key) + 1;
-    property_add(root, strdup(key), strdup(value));
-    return true;
-}
-
-bool property_dynamic_free(char *key, char *value, void *user_data) {
-    free(key);
-    free(value);
-    return true;
 }
