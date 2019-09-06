@@ -5,8 +5,8 @@ project(11.Testing)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(.)
 
-
-if (UNIX)
+if (APPLE)
+elseif (UNIX)
     set(SYSTEM_LIBRARIES pthread)
 else ()
     set(SYSTEM_LIBRARIES ws2_32)

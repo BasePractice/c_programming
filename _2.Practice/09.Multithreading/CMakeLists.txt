@@ -6,7 +6,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(.)
 
 
-if (UNIX)
+if (APPLE)
+    set(SIMPLE_MAIN .not_implement_yet.c)
+    set(MT_SERVER .not_implement_yet.c)
+elseif (UNIX)
     set(SYSTEM_LIBRARIES pthread)
     set(SIMPLE_MAIN simple_thread.c)
     set(MT_SERVER mt_unix_server.c)
