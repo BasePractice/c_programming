@@ -4,6 +4,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
+#include "default_server.h"
 
 int main( int argc, char* argv[] ) {
     int ret;
@@ -22,6 +23,7 @@ int main( int argc, char* argv[] ) {
     _CrtMemCheckpoint(&_checkpoint_start);
 #endif
     {
+        opcua::default_server ds;
         ret = Catch::Session().run( argc, argv );
     }
 #if defined(_MSC_VER) && defined(MEMORY_LEAK_DETECT)

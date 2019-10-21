@@ -169,19 +169,35 @@ int register_client(const char *url) {
     return ret == UA_STATUSCODE_GOOD ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-void write_value(UA_Client *client, const UA_NodeId node_id, const UA_Int32 n) {
+UA_UInt32 read_value(UA_Client *client, UA_NodeId node_id) {
     UA_Variant value;
-    UA_Variant_init(&value);
+    UA_StatusCode ret;
+    UA_UInt32 v = 0;
 
-    UA_Variant_setScalar(&value, (void *)&n, &UA_TYPES[UA_TYPES_INT32]);
+    UA_Variant_init(&value);
+    ret = UA_Client_readValueAttribute(client, node_id, &value);
+    if (ret == UA_STATUSCODE_GOOD &&
+        UA_Variant_hasScalarType(&value, &UA_TYPES[UA_TYPES_UINT32])) {
+        v = *(UA_UInt32 *) value.data;
+    } else {
+        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Read value error: %s", UA_StatusCode_name(ret));
+    }
+    return v;
+}
+
+void write_value(UA_Client *client, UA_NodeId node_id, UA_UInt32 n) {
+    UA_Variant value;
+
+    UA_Variant_init(&value);
+    UA_Variant_setScalar(&value, (void *) &n, &UA_TYPES[UA_TYPES_UINT32]);
     UA_StatusCode ret = UA_Client_writeValueAttribute(client, node_id, &value);
 
     if (ret == UA_STATUSCODE_GOOD) {
         UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Value %d write success", n);
     } else {
-        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Value %d write failure, error: %d", n, ret);
+        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Value %d write failure, error: %s", n,
+                     UA_StatusCode_name(ret));
     }
-    UA_Variant_clear(&value);
 }
 
 /**

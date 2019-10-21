@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "open62541.h"
+#include "main_server.h"
 
 UA_Boolean running = true;
 static void stop_handler(int signal) {
@@ -16,7 +17,7 @@ int main(int argc, char **argv) {
 
     server = UA_Server_new();
     UA_ServerConfig_setDefault(UA_Server_getConfig(server));
-
+    register_objects(server);
     ret = UA_Server_run(server, &running);
 
     UA_Server_delete(server);
