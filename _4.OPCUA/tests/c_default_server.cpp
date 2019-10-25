@@ -18,6 +18,6 @@ TEST_CASE("Проверка записи значения", DEFAULT_SERVER_TAG) 
     opcua::default_client c;
 
     c.write_value(10);
-    UA_UInt32 v = c.read_value();
+    UA_UInt16 v = c.read_value();
     REQUIRE(v == 10);
 }
