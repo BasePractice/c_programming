@@ -1,6 +1,6 @@
 #include <signal.h>
 #include <stdlib.h>
-#include "open62541.h"
+#include <open62541.h>
 #include "main_server.h"
 
 UA_Boolean running = true;
