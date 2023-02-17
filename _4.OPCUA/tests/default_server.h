@@ -2,7 +2,7 @@
 #define SIMPLE_SERVER_DEFAULT_SERVER_H
 
 #include <cstdlib>
-#include <open62541.h>
+#include <open62541/server.h>
 #include <main_server.h>
 
 extern "C" {

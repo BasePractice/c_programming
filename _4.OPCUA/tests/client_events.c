@@ -1,5 +1,9 @@
 #include <signal.h>
-#include "open62541.h"
+#include <open62541/plugin/log_stdout.h>
+#include <open62541/client.h>
+#include <open62541/client_subscriptions.h>
+#include <open62541/client_config_default.h>
+#include <open62541/client_highlevel.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable:4996) // warning C4996: 'UA_Client_Subscriptions_addMonitoredEvent': was declared deprecated

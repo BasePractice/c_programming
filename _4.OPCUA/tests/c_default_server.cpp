@@ -1,15 +1,16 @@
 #include <cstdlib>
 #include <cstring>
-#include <open62541.h>
 #include "default_server.h"
-#include "catch.hpp"
+#include <catch2/catch_all.hpp>
 
 #if defined(WIN32)
 
 #include <windows.h>
 
 #else
+
 #include <unistd.h>
+
 #endif
 
 #define DEFAULT_SERVER_TAG "[opcua/default/server]"

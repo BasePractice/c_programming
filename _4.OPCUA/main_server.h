@@ -1,6 +1,6 @@
 #ifndef SIMPLE_SERVER_MAIN_SERVER_H
 #define SIMPLE_SERVER_MAIN_SERVER_H
-#include <open62541.h>
+#include <open62541/server.h>
 
 #if defined(__cplusplus)
 extern "C" {

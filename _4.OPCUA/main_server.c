@@ -1,5 +1,5 @@
 #include "main_server.h"
-#include <open62541.h>
+#include <open62541/plugin/log_stdout.h>
 
 UA_NodeId Detector_id;
 UA_NodeId Detector_value_id;
@@ -37,7 +37,7 @@ void register_objects(UA_Server *server) {
     UA_StatusCode sc;
     {
         UA_ObjectAttributes device_attributes = UA_ObjectAttributes_default;
-        device_attributes.displayName = UA_LOCALIZEDTEXT("ru-RU", "Устройство");
+        device_attributes.displayName = UA_LOCALIZEDTEXT("ru-RU", "Устройства");
         sc = UA_Server_addObjectNode(server, UA_NODEID_NULL,
                                      UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
                                      UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
@@ -51,7 +51,7 @@ void register_objects(UA_Server *server) {
     }
     {
         UA_VariableAttributes type_attributes = UA_VariableAttributes_default;
-        type_attributes.displayName = UA_LOCALIZEDTEXT("ru-RU", "Датчики");
+        type_attributes.displayName = UA_LOCALIZEDTEXT("ru-RU", "Датчик");
         type_attributes.valueRank = UA_VALUERANK_SCALAR;
         type_attributes.dataType = UA_TYPES[UA_TYPES_UINT16].typeId;
         type_attributes.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;

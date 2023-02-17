@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_RUNNER
-#include "catch.hpp"
+#include <catch2/catch_all.hpp>
 #if defined(_MSC_VER) && defined(MEMORY_LEAK_DETECT)
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
